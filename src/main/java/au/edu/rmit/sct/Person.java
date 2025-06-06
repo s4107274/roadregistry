@@ -422,5 +422,77 @@ public class Person {
 
         writeAllPersonsToFile(all);
         return true;
+    }  
+
+      public String addDemeritPoints(String offenseDate, int points)  {
+        // offenseDate format validating
+        if (!isValidDate(offenseDate)) {
+            return "Failed";
+        }
+
+        // load all Persons and find the one with this.personID
+        List<Person> all = readAllPersonsFromFile();
+        Person target = null;
+        for (Person p : all) {
+            if (p.getPersonID().equals(this.personID)) {
+                target = p;
+                break;
+            }
+        }
+        if (target == null) {
+            return "Failed";  // no such Person
+        }
+
+        // calculate the person’s age at the time of offense
+        int ageAtOffense = calculateAge(target.getBirthdate(), offenseDate);
+        if (ageAtOffense < 0) {
+            return "Failed";
+        }
+
+        // validating points should be within [1 - 6]
+        if (points < 1 || points > 6) {
+            return "Failed";
+        }
+
+        // date object for parsing a offenseDate
+        Date offenseDt;
+        try {
+            DATE_FORMAT.setLenient(false);
+            offenseDt = DATE_FORMAT.parse(offenseDate);
+        } catch (ParseException ex) {
+            return "Failed";
+        }
+
+        // add this offense to the Person’s demeritPoints map
+        target.getDemeritPoints().put(offenseDt, points);
+
+        // calculate two years back boundary from offense date
+        Calendar twoYearsBack = Calendar.getInstance();
+        twoYearsBack.setTime(offenseDt);
+        twoYearsBack.add(Calendar.YEAR, -2);
+
+        // sum all points
+        int totalInWindow = 0;
+        for (Date d : target.getDemeritPoints().keySet()) {
+            if (!d.before(twoYearsBack.getTime()) && !d.after(offenseDt)) {
+                totalInWindow += target.getDemeritPoints().get(d);
+            }
+        }
+
+        //apply license suspension logic
+        if (ageAtOffense < 21) {
+            if (totalInWindow > 6) {
+                target.setSuspended(true);
+            }
+        } else {
+            if (totalInWindow > 12) {
+                target.setSuspended(true);
+            }
+        }
+
+        //rewrite data/persons.txt with the updated Person
+        writeAllPersonsToFile(all);
+        return "Success";
     }
+
 }
