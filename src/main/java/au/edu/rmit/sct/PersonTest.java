@@ -9,25 +9,26 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+
 public class PersonTest {
     private Person person;
 
-    
+   
     private static final String PERSON_FILE = "data/persons.txt";
 
     @BeforeEach
     void setUp() {
-    
-        person = new Person("00000000AA", "Dummy", "Dummy", "1|X|X|Victoria|Australia", "01-01-2000");
-    
-        try {
+          person = new Person("00000000AA", "Dummy", "Dummy", "1|X|X|Victoria|Australia", "01-01-2000");
+          try {
             Files.deleteIfExists(Paths.get(PERSON_FILE));
         } catch (IOException e) {
             System.err.println("Warning: could not delete " + PERSON_FILE + ": " + e.getMessage());
         }
     }
 
+
     // 1) ADD PERSON FUNCTION TESTS (5 test cases)
+
 
     @Test
     @DisplayName("AddPerson Test 1: Valid person with all conditions met")
@@ -96,7 +97,7 @@ public class PersonTest {
 
     
     // 2) UPDATE PERSONAL DETAILS FUNCTION TESTS (5 test cases)
-   
+  
 
     @Test
     @DisplayName("UpdatePersonalDetails Test 1: Valid update for adult")
@@ -152,7 +153,7 @@ public class PersonTest {
     @Test
     @DisplayName("UpdatePersonalDetails Test 4: Invalid—ID change when first digit is even")
     void testUpdatePersonalDetails_EvenFirstDigitIDChange_ShouldReturnFalse() {
-        String originalID = "89!@#$%PQR";
+        String originalID = "89!@#$%PQR"; 
         person = new Person(originalID, "Grace", "Taylor",
                 "45|King Street|Melbourne|Victoria|Australia",
                 "12-04-1993");
@@ -182,9 +183,9 @@ public class PersonTest {
         assertTrue(result, "updatePersonalDetails should return true when changing only birthday");
     }
 
-   
+    
     // 3) ADD DEMERIT POINTS FUNCTION TESTS (5 test cases)
-
+    
 
     @Test
     @DisplayName("AddDemeritPoints Test 1: Valid demerit points addition")
@@ -195,8 +196,9 @@ public class PersonTest {
                 "15-03-1995");
         assertTrue(person.addPerson());
 
-        Person proxy = new Person(originalID, null, null, null, null);
-        String result = proxy.addDemeritPoints("20-11-2023", 3);
+
+        person.setPersonID(originalID);
+        String result = person.addDemeritPoints("20-11-2023", 3);
         assertEquals("Success", result, "addDemeritPoints should return 'Success' for valid input");
     }
 
@@ -209,8 +211,8 @@ public class PersonTest {
                 "22-07-1990");
         assertTrue(person.addPerson());
 
-        Person proxy = new Person(originalID, null, null, null, null);
-        String result = proxy.addDemeritPoints("15-10-2023", 8);
+        person.setPersonID(originalID);
+        String result = person.addDemeritPoints("15-10-2023", 8);
         assertEquals("Failed", result, "addDemeritPoints should return 'Failed' for invalid point range");
     }
 
@@ -223,8 +225,8 @@ public class PersonTest {
                 "10-12-1988");
         assertTrue(person.addPerson());
 
-        Person proxy = new Person(originalID, null, null, null, null);
-        String result = proxy.addDemeritPoints("2023-11-15", 2);
+        person.setPersonID(originalID);
+        String result = person.addDemeritPoints("2023-11-15", 2);
         assertEquals("Failed", result, "addDemeritPoints should return 'Failed' for invalid date format");
     }
 
@@ -237,11 +239,11 @@ public class PersonTest {
                 "15-06-2005"); // minor
         assertTrue(person.addPerson());
 
-        Person proxy1 = new Person(originalID, null, null, null, null);
-        assertEquals("Success", proxy1.addDemeritPoints("10-01-2023", 4));
+        person.setPersonID(originalID);
+        assertEquals("Success", person.addDemeritPoints("10-01-2023", 4));
 
-        Person proxy2 = new Person(originalID, null, null, null, null);
-        String result = proxy2.addDemeritPoints("15-02-2023", 4);
+        
+        String result = person.addDemeritPoints("15-02-2023", 4);
         assertEquals("Success", result, "addDemeritPoints should return 'Success' even when suspension is triggered");
 
         Person fromFile = Person.parseFromLine(Files.readAllLines(Paths.get(PERSON_FILE)).get(0).trim());
@@ -255,17 +257,13 @@ public class PersonTest {
         String originalID = "24%^&*@KLM";
         person = new Person(originalID, "Mia", "Thompson",
                 "8|Bourke Street|Melbourne|Victoria|Australia",
-                "20-01-1980"); // adult
+                "20-01-1980"); 
         assertTrue(person.addPerson());
 
-        Person proxy1 = new Person(originalID, null, null, null, null);
-        assertEquals("Success", proxy1.addDemeritPoints("05-03-2023", 6));
-
-        Person proxy2 = new Person(originalID, null, null, null, null);
-        assertEquals("Success", proxy2.addDemeritPoints("10-06-2023", 6));
-
-        Person proxy3 = new Person(originalID, null, null, null, null);
-        String result = proxy3.addDemeritPoints("20-08-2023", 3);
+        person.setPersonID(originalID);
+        assertEquals("Success", person.addDemeritPoints("05-03-2023", 6));
+        assertEquals("Success", person.addDemeritPoints("10-06-2023", 6));
+        String result = person.addDemeritPoints("20-08-2023", 3);
         assertEquals("Success", result, "addDemeritPoints should return 'Success' even when suspension is triggered");
 
         Person fromFile = Person.parseFromLine(Files.readAllLines(Paths.get(PERSON_FILE)).get(0).trim());
